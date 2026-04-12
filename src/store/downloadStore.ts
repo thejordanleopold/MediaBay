@@ -30,6 +30,17 @@ interface DownloadState {
   resumeItem: (id: string) => void
   cancelItem: (id: string) => void
   updateProgress: (id: string, progress: number, speed: string, eta: string) => void
+  applyProgressEvent: (event: ProgressEvent) => void
+}
+
+export interface ProgressEvent {
+  id: string
+  progress: number
+  speed: string
+  eta: string
+  status: DownloadStatus
+  fileSize: string
+  title?: string
 }
 
 export const useDownloadStore = create<DownloadState>()((set) => ({
@@ -79,5 +90,23 @@ export const useDownloadStore = create<DownloadState>()((set) => ({
             }
           : item,
       ),
+    })),
+
+  applyProgressEvent: ({ id, progress, speed, eta, status, fileSize, title }) =>
+    set((state) => ({
+      queue: state.queue.map((item) => {
+        if (item.id !== id) return item
+        // Don't overwrite a paused state with a stale downloading event
+        if (item.status === 'paused' && status === 'downloading') return item
+        return {
+          ...item,
+          progress,
+          speed,
+          eta,
+          status,
+          fileSize: fileSize || item.fileSize,
+          title: title ?? item.title,
+        }
+      }),
     })),
 }))
