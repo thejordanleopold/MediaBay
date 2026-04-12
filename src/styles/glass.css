@@ -1,0 +1,39 @@
+.glass {
+  background:              var(--glass-bg);
+  backdrop-filter:         blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border:                  1px solid var(--glass-border);
+  border-radius:           var(--glass-border-radius);
+  box-shadow:              var(--shadow-glass);
+}
+
+.glass:hover {
+  background:              var(--glass-bg-hover);
+  backdrop-filter:         blur(var(--glass-blur-hover));
+  -webkit-backdrop-filter: blur(var(--glass-blur-hover));
+}
+
+.glass-secondary {
+  background:              var(--glass-bg-secondary);
+  backdrop-filter:         blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border:                  1px solid var(--glass-border-subtle);
+  border-radius:           var(--glass-border-radius-sm);
+  box-shadow:              var(--shadow-glass-sm);
+}
+
+/* Apply behind body text on busy glass backgrounds to guarantee 4.5:1 contrast */
+.glass-text-overlay {
+  background:    rgba(0, 0, 0, 0.30);
+  border-radius: 6px;
+  padding:       2px 6px;
+}
+
+.glass-active {
+  transform:  scale(0.99);
+  transition: transform var(--transition-fast);
+}
+
+.glass-glow {
+  box-shadow: var(--shadow-glass), var(--shadow-glow);
+}
