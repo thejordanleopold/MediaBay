@@ -1,120 +1,72 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { Download, Library, Play, Settings, Info } from 'lucide-react'
+import { TopBar } from './components/layout/TopBar'
+import { SideNav, type NavItem } from './components/layout/SideNav'
+import { ContentArea } from './components/layout/ContentArea'
+import { DownloadScreen } from './screens/DownloadScreen'
+import { LibraryScreen } from './screens/LibraryScreen'
+import { PlayerScreen } from './screens/PlayerScreen'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const NAV_ITEMS: NavItem[] = [
+  { id: 'download', label: 'Download', icon: Download, href: '/download' },
+  { id: 'library',  label: 'Library',  icon: Library,  href: '/library'  },
+  { id: 'player',   label: 'Player',   icon: Play,     href: '/player'   },
+  { id: 'settings', label: 'Settings', icon: Settings, href: '/settings' },
+  { id: 'about',    label: 'About',    icon: Info,     href: '/about'    },
+]
+
+function routeToNavId(pathname: string): NavItem['id'] | null {
+  const entry = NAV_ITEMS.find((item) => pathname.startsWith(item.href))
+  return entry ? entry.id : null
+}
+
+function AppShell() {
+  const [collapsed, setCollapsed] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const activeId = routeToNavId(location.pathname)
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: 'var(--top-bar-height) 1fr',
+        gridTemplateColumns: collapsed
+          ? 'var(--sidebar-collapsed) 1fr'
+          : 'var(--sidebar-width) 1fr',
+        transition: 'grid-template-columns 220ms ease',
+        height: '100vh',
+        overflow: 'hidden',
+      }}
+    >
+      <TopBar onMenuToggle={() => setCollapsed((c) => !c)} />
+      <SideNav
+        items={NAV_ITEMS}
+        activeId={activeId}
+        collapsed={collapsed}
+        onNavigate={(href) => navigate(href)}
+      />
+      <ContentArea>
+        <Routes>
+          <Route path="/" element={<Navigate to="/download" replace />} />
+          <Route path="/download" element={<DownloadScreen />} />
+          <Route path="/library" element={<LibraryScreen />} />
+          <Route path="/player" element={<PlayerScreen />} />
+          <Route path="/player/:id" element={<PlayerScreen />} />
+          <Route path="*" element={<Navigate to="/download" replace />} />
+        </Routes>
+      </ContentArea>
+    </div>
+  )
+}
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+function App() {
+  return (
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
   )
 }
 

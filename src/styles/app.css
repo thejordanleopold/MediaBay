@@ -1,0 +1,50 @@
+/* ── Page transitions ─────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .page-enter {
+    animation: page-enter 280ms ease forwards;
+  }
+
+  /* ── Progress shimmer ─────────────────────────── */
+  @keyframes shimmer-sweep {
+    0%   { transform: translateX(-150%); }
+    100% { transform: translateX(250%); }
+  }
+
+  .progress-shimmer {
+    overflow: hidden;
+  }
+
+  .progress-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.22) 50%,
+      transparent 100%
+    );
+    animation: shimmer-sweep 1.4s linear infinite;
+  }
+
+  /* ── Loader spin ──────────────────────────────── */
+  @keyframes spin-1s {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .spin-1s {
+    animation: spin-1s 1s linear infinite;
+  }
+}
