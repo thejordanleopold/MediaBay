@@ -56,9 +56,13 @@ export function DownloadScreen() {
       fileSize: '',
     })
 
+    // Optimistically mark as downloading — don't wait for the first Rust event
+    applyProgressEvent({ id, progress: 0, speed: '', eta: '', status: 'downloading', fileSize: '' })
+
     setLoading(false)
 
-    // Fire-and-forget — progress comes back via the 'download-progress' event
+    // Errors from invoke (e.g. command not registered, yt-dlp missing)
+    // surface as an error badge instead of silently staying "queued"
     await invoke('start_download', {
       id,
       url,
@@ -69,6 +73,15 @@ export function DownloadScreen() {
       metadata: options.metadata,
     }).catch((err: unknown) => {
       console.error('start_download error:', err)
+      applyProgressEvent({
+        id,
+        progress: 0,
+        speed: '',
+        eta: '',
+        status: 'error',
+        fileSize: '',
+        title: err instanceof Error ? err.message : String(err),
+      })
     })
   }
 
